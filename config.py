@@ -2,7 +2,7 @@ import os
 
 
 WTF_CSRF_ENABLED = True
-SECRET_KEY = 'noko-du-aldri_kjem-til-aa-gjette'
+SECRET_KEY = 'noko-du-aldri-kjem-til-aa-gjette'
 
 OPENID_PROVIDERS = [
     {'name': 'Google', 'url': 'https://google.com/accounts/o8/id'},
@@ -17,3 +17,10 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'migrations')
 SLQALCHEMY_TRACK_MODIFICATIONS = False
+
+MAIL_SERVER = 'localhost'
+MAIL_PORT = 25
+MAIL_USERNAME = None
+MAIL_PASSWORD = None
+
+ADMINS = ['krigar1184@gmail.com']

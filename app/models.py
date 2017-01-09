@@ -6,7 +6,9 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nickname = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
+    about_me = db.Column(db.String(140))
     posts = db.relationship('Post', backref='author', lazy='dynamic')
+    last_seen = db.Column(db.DateTime)
 
     def __repr__(self):
         return '<User %r>' % (self.nickname)
@@ -22,6 +24,20 @@ class User(db.Model):
     @property
     def is_anonymous(self):
         return False
+
+    @staticmethod
+    def make_unique_nickname(nickname):
+        if User.query.filter_by(nickname=nickname).count() == 0:
+            return nickname
+
+        version = 2
+        while True:
+            new_nickname = nickname + str(version)
+
+            if User.query.filter_by(nickname=new_nickname).count() == 0:
+                return new_nickname
+
+            version += 1
 
     def get_id(self):
         try:
