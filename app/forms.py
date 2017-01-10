@@ -31,3 +31,11 @@ class EditForm(FlaskForm):
             return False
 
         return True
+
+
+class PostForm(FlaskForm):
+    post = StringField('post', validators=[DataRequired()])
+
+
+class SearchForm(FlaskForm):
+    search = StringField('search', validators=[DataRequired()])

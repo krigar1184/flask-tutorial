@@ -3,6 +3,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_openid import OpenID
+from flask_mail import Mail
 from config import basedir, ADMINS, MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD
 
 
@@ -20,7 +21,7 @@ oid = OpenID(app, os.path.join(basedir, 'tmp'))
 if not app.debug:
     import logging
     from logging.handlers import SMTPHandler, RotatingFileHandler
-    
+
     file_handler = RotatingFileHandler('tmp/log', 'a', 1 * 1024 * 1024, 10)
     file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
     file_handler.setLevel(logging.INFO)
@@ -34,5 +35,7 @@ if not app.debug:
 
     app.logger.addHandler(file_handler)
     app.logger.addHandler(mail_handler)
+
+mail = Mail(app)
 
 from app import views, models

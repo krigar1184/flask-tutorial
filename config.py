@@ -24,3 +24,8 @@ MAIL_USERNAME = None
 MAIL_PASSWORD = None
 
 ADMINS = ['krigar1184@gmail.com']
+
+POSTS_PER_PAGE = 2
+
+WHOOSH_BASE = os.path.join(basedir, 'search.db')
+MAX_SEARCH_RESULTS = 50
