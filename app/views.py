@@ -4,7 +4,7 @@ from flask import render_template, flash, redirect, \
     session, url_for, request, g
 from flask_login import login_user, logout_user, current_user, login_required
 from app.forms import LoginForm, EditForm
-from app.models import User
+from app.models import User, Post
 from app import login_manager, db, oid
 
 
@@ -44,6 +44,9 @@ def after_login(resp):
         db.session.add(user)
         db.session.commit()
 
+        db.session.add(user.follow(user))
+        db.session.commit()
+
     remember_me = False
     if remember_me in session:
         remember_me = session['remember_me']
@@ -80,6 +83,7 @@ def index():
         }
     ]
 
+    posts = user.followed_posts()
     return render_template(
         'index.html',
         title='Home',
@@ -121,10 +125,7 @@ def user(nickname):
         flash('User %s not found.' % nickname)
         return redirect(url_for('index'))
 
-    posts = [
-        {'author': user, 'body': 'test post #1'},
-        {'author': user, 'body': 'test post #2'}
-    ]
+    posts = Post.query.filter_by(user_id=user.id)
 
     return render_template(
         'user.html',
@@ -152,3 +153,40 @@ def edit():
 
         return render_template('edit.html',
                                form=form)
+
+
+@app.route('/follow/<string:nickname>')
+@login_required
+def follow(nickname):
+    followed = User.query.filter_by(nickname=nickname).first()
+    if followed is None:
+        flash('User %s not found' % nickname)
+        return redirect(url_for('index'))
+    elif followed == g.user:
+        flash('You can\'t follow yourself!')
+        return redirect(url_for('index'))
+
+    u = g.user.follow(followed)
+    db.session.add(u)
+    db.session.commit()
+
+    flash('You are now following %s!' % nickname)
+    return redirect(url_for('user', nickname=nickname))
+
+
+@app.route('/unfollow/<string:nickname>')
+@login_required
+def unfollow(nickname):
+    followed = User.query.filter_by(nickname=nickname).first()
+    if followed is None:
+        flash('User %s not found' % nickname)
+        return redirect(url_for('index'))
+    elif followed == g.user:
+        flash('You can\'t follow yourself!')
+        return redirect(url_for('index'))
+    u = g.user.unfollow(followed)
+    db.session.add(u)
+    db.session.commit()
+
+    flash('You have stopped following %s' % nickname)
+    return redirect(url_for('user', nickname=nickname))

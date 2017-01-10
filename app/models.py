@@ -62,17 +62,19 @@ class User(db.Model):
     def follow(self, user):
         if not self.is_following(user):
             self.followed.append(user)
-
         return self
 
     def unfollow(self, user):
         if self.is_following(user):
-            self.followed.remove(self)
-
+            self.followed.remove(user)
         return self
 
     def is_following(self, user):
-        return self.followed.filter(followers.c.followed_id == user.id).count > 0
+        return self.followed.filter(followers.c.followed_id == user.id).count() > 0
+
+    def followed_posts(self):
+        return Post.query.join(followers,
+                               (followers.c.followed_id == Post.user_id)).filter(followers.c.follower_id == self.id).order_by(Post.timestamp.desc())
 
 
 class Post(db.Model):
