@@ -3,8 +3,9 @@ from app import app
 from flask import render_template, flash, redirect, \
     session, url_for, request, g
 from flask_login import login_user, logout_user, current_user, login_required
-from app.forms import LoginForm, EditForm, PostForm, SearchForm
-from app.models import User, Post
+from .forms import LoginForm, EditForm, PostForm, SearchForm
+from .models import User, Post
+from .emails import follower_notification
 from app import login_manager, db, oid
 from config import POSTS_PER_PAGE, MAX_SEARCH_RESULTS
 
@@ -162,6 +163,7 @@ def edit():
 @login_required
 def follow(nickname):
     followed = User.query.filter_by(nickname=nickname).first()
+
     if followed is None:
         flash('User %s not found' % nickname)
         return redirect(url_for('index'))
@@ -174,6 +176,7 @@ def follow(nickname):
     db.session.commit()
 
     flash('You are now following %s!' % nickname)
+    follower_notification(u, g.user)
     return redirect(url_for('user', nickname=nickname))
 
 

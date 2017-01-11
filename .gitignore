@@ -3,3 +3,9 @@ __pycache__/
 tmp/
 debugdata/
 *.swp
+tags
+NetrwTreeListing*
+app.db
+test.db
+search.db
+node_modules
