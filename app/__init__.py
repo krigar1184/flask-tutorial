@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
+
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_openid import OpenID
 from flask_mail import Mail
+from flask_babel import Babel
 from config import basedir, ADMINS, MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD
 from .momentjs import momentjs
 
@@ -40,4 +43,7 @@ if not app.debug:
 mail = Mail(app)
 
 app.jinja_env.globals['momentjs'] = momentjs
+
+babel = Babel(app)
+
 from app import views, models

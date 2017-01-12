@@ -1,6 +1,7 @@
 from app import db, app
 from hashlib import md5
 import sys
+import re
 
 
 enable_search = sys.version_info >= (3, 0)
@@ -56,6 +57,11 @@ class User(db.Model):
                 return new_nickname
 
             version += 1
+
+    @staticmethod
+    def make_valid_nickname(nickname):
+        return re.sub('[^a-zA-Z0-9_\.]', '', nickname)
+
 
     def get_id(self):
         try:
