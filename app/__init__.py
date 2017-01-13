@@ -6,19 +6,34 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_openid import OpenID
 from flask_mail import Mail
-from flask_babel import Babel
+from flask_babel import Babel, lazy_gettext
+from flask.json import JSONEncoder
+
 from config import basedir, ADMINS, MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD
 from .momentjs import momentjs
 
 
+class CustomJSONEncoder(JSONEncoder):
+    def default(self, obj):
+        from speaklater import is_lazy_string
+        if is_lazy_string(obj):
+            try:
+                return unicode(obj)
+            except NameError:
+                return str(obj)
+        return super(CustomJSONEncoder, self).default(obj)
+
+
 app = Flask(__name__)
 app.config.from_object('config')
+app.json_encoder = CustomJSONEncoder
 
 db = SQLAlchemy(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+login_manager.login_message = lazy_gettext('Please login to access the page.')
 
 oid = OpenID(app, os.path.join(basedir, 'tmp'))
 

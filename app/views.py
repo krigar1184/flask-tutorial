@@ -30,6 +30,8 @@ def before_request():
         db.session.add(g.user)
         db.session.commit()
 
+    g.locale = get_locale()
+
 
 @login_manager.user_loader
 def load_user(id):
